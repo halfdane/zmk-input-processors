@@ -1,6 +1,0 @@
-description: |
-  Sensor driver for the Cirque Pinnacle trackpad ASICs, using the I2C interface
-
-compatible: "zmk,input-processor-tap"
-
-include: ["zmk,input-processor-tap.yaml"]
