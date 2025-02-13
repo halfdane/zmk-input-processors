@@ -1,3 +1,8 @@
+# Copyright (c) 2021 The ZMK Contributors
+# SPDX-License-Identifier: MIT
+
+description: Detects a tap on a touchpad
+
 compatible: "zmk,input-processor-tap"
 
 properties:
