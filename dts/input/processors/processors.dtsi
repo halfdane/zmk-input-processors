@@ -4,8 +4,4 @@
  * SPDX-License-Identifier: MIT
  */
 
-#include <input/processors/scaler.dtsi>
-#include <input/processors/code_mapper.dtsi>
-#include <input/processors/transform.dtsi>
-#include <input/processors/temp_layer.dtsi>
-#include <input/processors/behaviors.dtsi>
+#include <input/processors/tap.dtsi>
