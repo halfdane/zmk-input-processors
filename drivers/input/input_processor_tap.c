@@ -1,132 +1,51 @@
-#define DT_DRV_COMPAT zmk_behavior_haptic_feedback
+/*
+ * Copyright (c) 2024 The ZMK Contributors
+ *
+ * SPDX-License-Identifier: MIT
+ */
 
+#define DT_DRV_COMPAT zmk_input_processor_tap
+
+#include <zephyr/kernel.h>
 #include <zephyr/device.h>
-#include <drivers/behavior.h>
-#include <zephyr/drivers/gpio.h>
+#include <drivers/input_processor.h>
+
 #include <zephyr/logging/log.h>
-
-#include <zmk/keymap.h>
-#include <zmk/behavior.h>
-
-#include <zmk/ble.h>    
-#include <zmk/event_manager.h>
-#include <zmk/events/ble_active_profile_changed.h>
+#include "input_additional_behaviors.h";
 
 LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 
-// NOTE: checked in Kconfig & CMakeLists.txt
-// #if DT_HAS_COMPAT_STATUS_OKAY(DT_DRV_COMPAT)
-#define RUMBLE_NODE	DT_CHOSEN(DT_DRV_COMPAT)
+struct tap_config {
+    uint8_t timeout;
+};
 
-int ACTIVE_DURATION = 100;
-int INACTIVE_DURATION = 50;
+static int tap_handle_event(const struct device *dev, struct input_event *event, uint32_t param1,
+                               uint32_t param2, struct zmk_input_processor_state *state) {
+    LOG_INF("Handling tap event");
+    return ZMK_INPUT_PROC_CONTINUE;
+}
 
-int ACTIVE = 0;
-int INACTIVE = 1;
+static int tap_init(const struct device *dev) {
+    LOG_INF("creating tap input processor");
 
-bool haptic_feedback_active = false;
-struct k_work_delayable haptic_feedback_timeout_task;
-uint8_t haptic_feedback_count = 0;
-
-static const struct gpio_dt_spec rmbl = GPIO_DT_SPEC_GET(RUMBLE_NODE, gpios);
-
-int _verify_gpio(const struct gpio_dt_spec *spec) {
-    if (!gpio_is_ready_dt(&rmbl)) {
-		LOG_ERR("Error: rumble device %d is not ready\n", rmbl.pin);
-		return -1;
-	}
-
-	if (gpio_pin_configure_dt(&rmbl, GPIO_OUTPUT_ACTIVE) < 0) {
-        LOG_ERR("Error: Couldn't activate rumble device %d\n", rmbl.pin);
-		return -2;
-	}
+    // for (int i = 0; i < MAX_LAYERS; i++) {
+    //     k_work_init_delayable(&layer_disable_works[i], layer_disable_callback);
+    // }
 
     return 0;
 }
 
-void _feedback_activate() {
-    if (_verify_gpio(&rmbl) < 0) {
-        return;
-    }
-    haptic_feedback_active = true;
-    gpio_pin_set_dt(&rmbl, ACTIVE);
-}
-
-void _feedback_deactivate() {
-    if (_verify_gpio(&rmbl) < 0) {
-        return;
-    }
-    haptic_feedback_active = false;
-    gpio_pin_set_dt(&rmbl, INACTIVE);
-}
-
-void _reset_feedback() {
-    haptic_feedback_count = 0;
-    _feedback_deactivate();
-}
-
-static void feedback_state_handler() {
-    k_work_cancel_delayable(&haptic_feedback_timeout_task);
-    
-    if(haptic_feedback_active) {
-        _feedback_deactivate();
-        if (haptic_feedback_count > 0) {
-            haptic_feedback_count--;
-            k_work_reschedule(&haptic_feedback_timeout_task, K_MSEC(INACTIVE_DURATION));
-        }
-    } else {
-        _feedback_activate();
-        k_work_reschedule(&haptic_feedback_timeout_task, K_MSEC(ACTIVE_DURATION));
-    }
-}
-
-static int haptic_feedback_keymap_binding_pressed(struct zmk_behavior_binding *binding,
-                                     struct zmk_behavior_binding_event event) {
-    _reset_feedback();
-    haptic_feedback_count = binding->param1 - 1;
-    feedback_state_handler();
-
-    return ZMK_BEHAVIOR_OPAQUE;
-}
-
-int ble_active_profile_change_listener(const zmk_event_t *eh)
-{
-    const struct zmk_ble_active_profile_changed *profile_ev = NULL;
-    if ((profile_ev = as_zmk_ble_active_profile_changed(eh)) == NULL) {
-        return ZMK_EV_EVENT_BUBBLE;
-    }
-
-    _reset_feedback();
-    haptic_feedback_count = profile_ev->index;
-    feedback_state_handler();
-
-    return ZMK_EV_EVENT_BUBBLE;
-}
-
-static int haptic_feedback_keymap_binding_released(struct zmk_behavior_binding *binding,
-                                      struct zmk_behavior_binding_event event) {
-    return ZMK_BEHAVIOR_OPAQUE;
-}
-
-static const struct behavior_driver_api behavior_haptic_feedback_driver_api = {
-    .binding_pressed = haptic_feedback_keymap_binding_pressed,
-    .binding_released = haptic_feedback_keymap_binding_released,
+static struct zmk_input_processor_driver_api tap_driver_api = {
+    .handle_event = tap_handle_event,
 };
 
-static int behavior_haptic_feedback_init(const struct device *dev) {
-    k_work_init_delayable(&haptic_feedback_timeout_task, feedback_state_handler);
-    return 0; 
-};
+#define TAP_INST(n)                                                                                \
+    static struct tap_data processor_tap_data_##n = {};                                            \
+    static const struct tap_config processor_tap_config_##n = {                                    \
+        .timeout = DT_INST_PROP_OR(n, timeout, 20),                                                \
+    };                                                                                             \
+    DEVICE_DT_INST_DEFINE(n, tap_init, NULL, &processor_tap_data_##n,                              \
+                          &processor_tap_config_##n, POST_KERNEL,                                  \
+                          CONFIG_KERNEL_INIT_PRIORITY_DEFAULT, &tap_driver_api);
 
-ZMK_LISTENER(ble_active_profile_change_status, ble_active_profile_change_listener)
-#if defined(CONFIG_ZMK_BLE)
-    ZMK_SUBSCRIPTION(ble_active_profile_change_status, zmk_ble_active_profile_changed);
-#endif
-
-BEHAVIOR_DT_INST_DEFINE(0, 
-        behavior_haptic_feedback_init, NULL, 
-        NULL, NULL, 
-        POST_KERNEL, CONFIG_KERNEL_INIT_PRIORITY_DEFAULT, 
-        &behavior_haptic_feedback_driver_api);
-
-// #endif /* DT_HAS_COMPAT_STATUS_OKAY(DT_DRV_COMPAT) */
+// DT_INST_FOREACH_STATUS_OKAY(TAP_INST)
