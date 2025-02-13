@@ -20,7 +20,7 @@ struct tap_config {
 
 static int tap_handle_event(const struct device *dev, struct input_event *event, uint32_t param1,
                                uint32_t param2, struct zmk_input_processor_state *state) {
-    LOG_INF("Handling tap event")
+    LOG_INF("Handling tap event");
     return ZMK_INPUT_PROC_CONTINUE;
 }
 
