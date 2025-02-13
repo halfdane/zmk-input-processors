@@ -11,9 +11,18 @@
 #include <drivers/input_processor.h>
 
 #include <zephyr/logging/log.h>
-#include "input_additional_behaviors.h"
 
 LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
+
+struct tap_config {
+    uint8_t timeout;
+};
+
+struct tap_data {
+    bool touch_start, is_tap;
+    const struct device *dev;
+    struct k_work work;
+};
 
 static int tap_handle_event(const struct device *dev, struct input_event *event, uint32_t param1,
                                uint32_t param2, struct zmk_input_processor_state *state) {
