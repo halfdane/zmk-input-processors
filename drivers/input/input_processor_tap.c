@@ -43,8 +43,13 @@ static int tap_init(const struct device *dev) {
     return 0;
 }
 
-static struct zmk_input_processor_driver_api tap_driver_api = {
+static const struct zmk_input_processor_driver_api tap_driver_api = {
     .handle_event = tap_handle_event,
+};
+
+/* Driver API */
+static const struct zmk_input_processor_driver_api temp_layer_driver_api = {
+    .handle_event = temp_layer_handle_event,
 };
 
 #define TAP_INST(n)                                                                                \
