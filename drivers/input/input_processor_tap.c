@@ -47,11 +47,6 @@ static const struct zmk_input_processor_driver_api tap_driver_api = {
     .handle_event = tap_handle_event,
 };
 
-/* Driver API */
-static const struct zmk_input_processor_driver_api temp_layer_driver_api = {
-    .handle_event = temp_layer_handle_event,
-};
-
 #define TAP_INST(n)                                                                                \
     static struct tap_data processor_tap_data_##n = {};                                            \
     static const struct tap_config processor_tap_config_##n = {                                    \
