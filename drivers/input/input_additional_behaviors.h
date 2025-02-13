@@ -7,6 +7,6 @@ struct tap_data {
 };
 
 struct tap_config {
-    uint8_t timeout
+    uint8_t timeout;
 };
 

@@ -11,7 +11,7 @@
 #include <drivers/input_processor.h>
 
 #include <zephyr/logging/log.h>
-#include "input_additional_behaviors.h";
+#include "input_additional_behaviors.h"
 
 LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 
