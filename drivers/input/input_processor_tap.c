@@ -6,14 +6,8 @@
 
 #define DT_DRV_COMPAT zmk_input_processor_tap
 
-#include <zephyr/kernel.h>
-#include <zephyr/device.h>
 #include <drivers/input_processor.h>
 #include <zephyr/logging/log.h>
-#include <zmk/keymap.h>
-#include <zmk/behavior.h>
-#include <zmk/events/position_state_changed.h>
-#include <zmk/events/keycode_state_changed.h>
 
 LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 
@@ -56,4 +50,4 @@ static const struct zmk_input_processor_driver_api tap_driver_api = {
                           &processor_tap_config_##n, POST_KERNEL,                                  \
                           CONFIG_KERNEL_INIT_PRIORITY_DEFAULT, &tap_driver_api);
 
-// DT_INST_FOREACH_STATUS_OKAY(TAP_INST)
+DT_INST_FOREACH_STATUS_OKAY(TAP_INST)
