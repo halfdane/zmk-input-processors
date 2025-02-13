@@ -1,0 +1,14 @@
+/*
+ * Copyright (c) 2024 The ZMK Contributors
+ *
+ * SPDX-License-Identifier: MIT
+ */
+
+#include <zephyr/dt-bindings/input/input-event-codes.h>
+
+/ {
+    /omit-if-no-ref/ zip_tap: zip_tap {
+        compatible = "zmk,input-processor-tap";
+        #input-processor-cells = <2>;
+    };
+};
