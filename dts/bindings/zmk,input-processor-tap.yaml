@@ -1,0 +1,7 @@
+compatible: "zmk,input-processor-tap"
+
+properties:
+  timeout:
+    type: int
+    default: 20
+

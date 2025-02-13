@@ -1,0 +1,8 @@
+/ {
+    behaviors {
+        /omit-if-no-ref/ zip_tap: zip {
+            compatible = "zmk,input-processor-tap";
+            #binding-cells = <1>;
+        };
+    };
+};
