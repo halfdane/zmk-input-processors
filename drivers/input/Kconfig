@@ -1,0 +1,17 @@
+# Copyright (c) 2022 The ZMK Contributors
+# SPDX-License-Identifier: MIT
+
+menu "Additional Pointer Behaviors"
+
+menuconfig ADDITIONAL_POINTER_BEHAVIORS
+     bool "Additional Pointer Behaviors"
+
+if ADDITIONAL_POINTER_BEHAVIORS
+
+config ZMK_INPUT_PROCESSOR_TAP
+    bool "Tap detector input processor, if your touchpad doesn't do it by itself"
+    default y
+    depends on DT_HAS_ZMK_INPUT_PROCESSOR_TAP_ENABLED
+    depends on  INPUT
+
+endif # ADDITIONAL_POINTER_BEHAVIORS

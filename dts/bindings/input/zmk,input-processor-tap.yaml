@@ -1,0 +1,5 @@
+properties:
+  timeout:
+    type: int
+    default: 20
+
