@@ -3,7 +3,7 @@
     behaviors {
         zip_tap: zip_tap {
             compatible = "zmk,input-processor-tap";
-            #input-processor-cells = <2>;
+            #input-processor-cells = <1>;
         };
     };
 };
