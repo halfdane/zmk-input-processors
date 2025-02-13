@@ -5,7 +5,7 @@ description: Detects a tap on a touchpad
 
 compatible: "zmk,input-processor-tap"
 
-include: one_param.yaml
+include: ip_one_param.yaml
 
 properties:
   timeout:
