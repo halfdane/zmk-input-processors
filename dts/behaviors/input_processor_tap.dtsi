@@ -4,6 +4,6 @@
         status = "okay";
         compatible = "zmk,input-processor-tap";
         #input-processor-cells = <0>;
-        timeout = <20>;
+        timeout = <120>;
     };
 };
