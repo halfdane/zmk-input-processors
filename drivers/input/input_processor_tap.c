@@ -21,6 +21,7 @@ struct tap_data {
     const struct device *dev;
     struct k_work_delayable tap_timeout_work;
     struct k_work_delayable touch_end_timeout_work;
+    struct k_work_delayable tap_end_timeout_work;
     uint32_t last_touch_timestamp;
 };
 
@@ -72,6 +73,9 @@ static int tap_handle_event(const struct device *dev, struct input_event *event,
         code = "[abs y]";
     }
 
+    input_report_rel(dev, INPUT_REL_X, -100, false, K_FOREVER);
+    input_report_rel(dev, INPUT_REL_Y, 0, true, K_FOREVER);
+
     uint32_t current_time = k_uptime_get();
     k_work_reschedule(&data->touch_end_timeout_work, K_MSEC(config->time_between_normal_reports));
     
@@ -90,8 +94,6 @@ static int tap_handle_event(const struct device *dev, struct input_event *event,
 
 /* Work Queue Callback */
 static void tap_timeout_callback(struct k_work *work) {
-    struct k_work_delayable *d_work = k_work_delayable_from_work(work);
-
     const struct device *dev = DEVICE_DT_INST_GET(0);
     struct tap_data *data = (struct tap_data *)dev->data;
 
@@ -99,9 +101,23 @@ static void tap_timeout_callback(struct k_work *work) {
         LOG_ERR("got a timeout but still touching- it's not a tap");
     } else {
         LOG_ERR("TAP");
+        input_report_key(dev, 256, 1, false, K_FOREVER);
+        input_report_rel(dev, INPUT_REL_X, 100, false, K_FOREVER);
+        input_report_rel(dev, INPUT_REL_Y, 100, true, K_FOREVER);
+
+        k_work_reschedule(&data->tap_end_timeout_work, K_MSEC(200));
     }
 
     data->is_tap = false;
+}
+
+static void tap_end_timeout_callback(struct k_work *work) {
+    const struct device *dev = DEVICE_DT_INST_GET(0);
+    struct tap_data *data = (struct tap_data *)dev->data;
+    input_report_key(dev, 256, 0, false, K_FOREVER);
+    input_report_rel(dev, INPUT_REL_X, -100, false, K_FOREVER);
+    input_report_rel(dev, INPUT_REL_Y, 0, true, K_FOREVER);
+    LOG_ERR("TAP DONE");
 }
 
 static void touch_end_timeout_callback(struct k_work *work) {
@@ -120,6 +136,7 @@ static int tap_init(const struct device *dev) {
 
     k_work_init_delayable(&data->tap_timeout_work, tap_timeout_callback);
     k_work_init_delayable(&data->touch_end_timeout_work, touch_end_timeout_callback);
+    k_work_init_delayable(&data->tap_end_timeout_work, tap_end_timeout_callback);
 
     return 0;
 }
@@ -135,10 +152,10 @@ static const struct zmk_input_processor_driver_api tap_driver_api = {
     };                                                                                             \
     static const struct tap_config processor_tap_config_##n = {                                    \
         .timeout = DT_INST_PROP_OR(n, timeout, 50),                                                \
-        .time_between_normal_reports = DT_INST_PROP_OR(n, time_between_normal_reports, 30),                                                \
+        .time_between_normal_reports = DT_INST_PROP_OR(n, time_between_normal_reports, 30),        \
     };                                                                                             \
     DEVICE_DT_INST_DEFINE(n, tap_init, NULL, &processor_tap_data_##n,                              \
                           &processor_tap_config_##n, POST_KERNEL,                                  \
-                          CONFIG_KERNEL_INIT_PRIORITY_DEFAULT, &tap_driver_api);
+                          CONFIG_INPUT_PINNACLE_INIT_PRIORITY, &tap_driver_api);
 
 DT_INST_FOREACH_STATUS_OKAY(TAP_INST)
