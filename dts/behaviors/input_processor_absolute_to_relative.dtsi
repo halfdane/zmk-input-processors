@@ -1,0 +1,8 @@
+
+/ {
+    zip_absolute_to_relative: zip_absolute_to_relative {
+        status = "okay";
+        compatible = "zmk,input-processor-absolute_to_relative";
+        #input-processor-cells = <0>;
+    };
+};
