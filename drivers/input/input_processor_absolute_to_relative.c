@@ -100,7 +100,6 @@ static const struct zmk_input_processor_driver_api absolute_to_relative_driver_a
         .touching = false,                                                                              \
     };                                                                                                  \
     static const struct absolute_to_relative_config processor_absolute_to_relative_config_##n = {       \
-        .timeout = DT_INST_PROP_OR(n, timeout, 50),                                                     \
         .time_between_normal_reports = DT_INST_PROP_OR(n, time_between_normal_reports, 30),             \
     };                                                                                                  \
     DEVICE_DT_INST_DEFINE(n, absolute_to_relative_init, NULL, &processor_absolute_to_relative_data_##n, \
