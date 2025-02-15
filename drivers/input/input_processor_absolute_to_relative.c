@@ -65,6 +65,7 @@ static int absolute_to_relative_handle_event(const struct device *dev, struct in
                 zmk_hid_mouse_movement_update(data->previous_x, event->value - data->previous_y);
                 data->previous_y = event->value;
             }
+            zmk_usb_hid_send_mouse_report();
         }
     }
 
