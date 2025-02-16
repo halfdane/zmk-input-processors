@@ -8,12 +8,15 @@
 
 #include <drivers/input_processor.h>
 #include <zephyr/logging/log.h>
+#include "touch_detection.h"
 
 LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 
 struct tap_config {
     uint8_t timeout;
     uint8_t time_between_normal_reports;
+
+    struct touch_detection_config touch_detection_config;
 };
 
 struct tap_data {
@@ -22,6 +25,8 @@ struct tap_data {
     struct k_work_delayable tap_timeout_work;
     struct k_work_delayable touch_end_timeout_work;
     uint32_t last_touch_timestamp;
+
+    struct touch_detection_data touch_detection_data;
 };
 
 static bool is_shortly_after_previous(uint8_t time_between_normal_reports, int64_t last_tapped, int64_t current_time) {

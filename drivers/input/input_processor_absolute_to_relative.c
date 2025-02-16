@@ -36,6 +36,8 @@ static int handle_touch_start(struct absolute_to_relative_data *data) {
 
 static int handle_touch_end(struct absolute_to_relative_data *data) {
     data->touching = false;
+    data->previous_x = 0;
+    data->previous_y = 0;
     LOG_INF("TOUCH ENDED");
     return 0;
 }
