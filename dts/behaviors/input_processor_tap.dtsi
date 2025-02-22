@@ -1,9 +1,0 @@
-
-/ {
-    zip_tap: zip_tap {
-        status = "okay";
-        compatible = "zmk,input-processor-tap";
-        #input-processor-cells = <0>;
-        timeout = <120>;
-    };
-};
