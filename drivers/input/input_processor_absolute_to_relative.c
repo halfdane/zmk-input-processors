@@ -60,14 +60,18 @@ static int absolute_to_relative_handle_event(const struct device *dev, struct in
         }
     } else {
         if (event->type == INPUT_EV_ABS) {
+            uint16_t value = event->value;
             if (event->code == INPUT_ABS_X) {
-                zmk_hid_mouse_movement_update(event->value - data->previous_x, data->previous_y);
-                data->previous_x = event->value;
+                event->type = INPUT_EV_REL;
+                event->code = INPUT_REL_X;
+                event->value -= data->previous_x;
+                data->previous_x = value;
             } else if (event->code == INPUT_ABS_Y) {
-                zmk_hid_mouse_movement_update(data->previous_x, event->value - data->previous_y);
-                data->previous_y = event->value;
+                event->type = INPUT_EV_REL;
+                event->code = INPUT_REL_Y;
+                event->value -= data->previous_y;
+                data->previous_y = value;
             }
-            zmk_usb_hid_send_mouse_report();
         }
     }
 
