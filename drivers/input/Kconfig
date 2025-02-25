@@ -1,9 +1,13 @@
 # Copyright (c) 2022 The ZMK Contributors
 # SPDX-License-Identifier: MIT
 
+if ZMK_POINTING
+
 DT_COMPAT_ZMK_INPUT_PROCESSOR_ABSOLUTE_TO_RELATIVE := zmk,input-processor-absolute-to-relative
 
 config ZMK_INPUT_PROCESSOR_ABSOLUTE_TO_RELATIVE
 		bool
 		default $(dt_compat_enabled,$(DT_COMPAT_ZMK_INPUT_PROCESSOR_ABSOLUTE_TO_RELATIVE))
+
+endif # ZMK_POINTING
 
