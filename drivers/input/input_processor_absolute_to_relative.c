@@ -55,7 +55,6 @@ static int absolute_to_relative_handle_event(const struct device *dev, struct in
 }
 
 static void touch_end_timeout_callback(struct k_work *work) {
-    struct k_work_delayable *d_work = k_work_delayable_from_work(work);
     const struct device *dev = DEVICE_DT_INST_GET(0);
     struct absolute_to_relative_data *data = (struct absolute_to_relative_data *)dev->data;
     data->touching_x = false;
