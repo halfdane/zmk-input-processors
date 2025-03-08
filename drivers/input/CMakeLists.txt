@@ -5,6 +5,8 @@ if (CONFIG_DT_HAS_ZMK_INPUT_PROCESSOR_ABSOLUTE_TO_RELATIVE_ENABLED AND NOT CONFI
     message( FATAL_ERROR "You don't have ZMK_POINTING configured, but zmk_input_processors depends on it." )    
 endif()
 
-zephyr_library()
+if (CONFIG_ZMK_INPUT_PROCESSOR_ABSOLUTE_TO_RELATIVE)
+    zephyr_library()
 
-zephyr_library_sources_ifdef(CONFIG_ZMK_INPUT_PROCESSOR_ABSOLUTE_TO_RELATIVE input_processor_absolute_to_relative.c)
+    zephyr_library_sources(input_processor_absolute_to_relative.c)
+endif()

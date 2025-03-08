@@ -82,6 +82,6 @@ static const struct zmk_input_processor_driver_api absolute_to_relative_driver_a
     };                                                                                                  \
     DEVICE_DT_INST_DEFINE(n, absolute_to_relative_init, NULL, &processor_absolute_to_relative_data_##n, \
                           &processor_absolute_to_relative_config_##n, POST_KERNEL,                      \
-                          CONFIG_INPUT_PINNACLE_INIT_PRIORITY, &absolute_to_relative_driver_api);
+                          CONFIG_INPUT_PROCESSOR_ABSOLUTE_TO_RELATIVE_INIT_PRIORITY, &absolute_to_relative_driver_api);
 
 DT_INST_FOREACH_STATUS_OKAY(ABSOLUTE_TO_RELATIVE_INST)
